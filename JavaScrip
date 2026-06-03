@@ -1,0 +1,40 @@
+#!/usr/bin/env node
+const readline = require('readline');
+
+const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout
+});
+
+function ask(question) {
+    return new Promise(resolve => rl.question(question, resolve));
+}
+
+async function main() {
+    const dateStr = await ask("Enter target date (YYYY-MM-DD): ");
+    const timeStr = await ask("Enter target time (HH:MM:SS): ");
+    const target = new Date(`${dateStr}T${timeStr}`);
+    if (isNaN(target.getTime())) {
+        console.log("Invalid date/time format.");
+        rl.close();
+        return;
+    }
+    console.log(`\n⏳ Counting down to ${target}...\n`);
+    const interval = setInterval(() => {
+        const now = new Date();
+        const diff = target - now;
+        if (diff <= 0) {
+            clearInterval(interval);
+            console.log("\n🎉 TIME'S UP! 🎉");
+            rl.close();
+            return;
+        }
+        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+        process.stdout.write(`\rRemaining: ${days} days, ${String(hours).padStart(2,'0')}:${String(minutes).padStart(2,'0')}:${String(seconds).padStart(2,'0')}`);
+    }, 1000);
+}
+
+main();
