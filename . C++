@@ -1,0 +1,53 @@
+#include <iostream>
+#include <ctime>
+#include <thread>
+#include <chrono>
+
+using namespace std;
+
+struct DateTime {
+    int year, month, day, hour, minute, second;
+};
+
+time_t to_time_t(const DateTime& dt) {
+    struct tm tm = {0};
+    tm.tm_year = dt.year - 1900;
+    tm.tm_mon = dt.month - 1;
+    tm.tm_mday = dt.day;
+    tm.tm_hour = dt.hour;
+    tm.tm_min = dt.minute;
+    tm.tm_sec = dt.second;
+    return mktime(&tm);
+}
+
+DateTime get_user_datetime() {
+    DateTime dt;
+    cout << "Enter target date (YYYY-MM-DD): ";
+    char dash;
+    cin >> dt.year >> dash >> dt.month >> dash >> dt.day;
+    cout << "Enter target time (HH:MM:SS): ";
+    cin >> dt.hour >> dash >> dt.minute >> dash >> dt.second;
+    return dt;
+}
+
+int main() {
+    DateTime target_dt = get_user_datetime();
+    time_t target = to_time_t(target_dt);
+    cout << "\n⏳ Counting down...\n";
+    while (true) {
+        time_t now = time(nullptr);
+        double diff = difftime(target, now);
+        if (diff <= 0) {
+            cout << "\n🎉 TIME'S UP! 🎉" << endl;
+            break;
+        }
+        int days = diff / 86400;
+        int hours = ((int)diff % 86400) / 3600;
+        int minutes = ((int)diff % 3600) / 60;
+        int seconds = (int)diff % 60;
+        printf("\rRemaining: %d days, %02d:%02d:%02d", days, hours, minutes, seconds);
+        fflush(stdout);
+        this_thread::sleep_for(chrono::seconds(1));
+    }
+    return 0;
+}
