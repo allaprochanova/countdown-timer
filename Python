@@ -1,0 +1,27 @@
+#!/usr/bin/env python3
+from datetime import datetime
+import time
+
+def get_user_datetime():
+    date_str = input("Enter target date (YYYY-MM-DD): ")
+    time_str = input("Enter target time (HH:MM:SS): ")
+    return datetime.strptime(f"{date_str} {time_str}", "%Y-%m-%d %H:%M:%S")
+
+def main():
+    target = get_user_datetime()
+    print(f"\n⏳ Counting down to {target}...\n")
+    while True:
+        now = datetime.now()
+        diff = target - now
+        if diff.total_seconds() <= 0:
+            print("🎉 TIME'S UP! 🎉")
+            break
+        days = diff.days
+        hours = diff.seconds // 3600
+        minutes = (diff.seconds % 3600) // 60
+        seconds = diff.seconds % 60
+        print(f"\rRemaining: {days} days, {hours:02d}:{minutes:02d}:{seconds:02d}", end="")
+        time.sleep(1)
+
+if __name__ == "__main__":
+    main()
